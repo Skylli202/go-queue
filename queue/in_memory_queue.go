@@ -13,6 +13,14 @@ type (
 	QueueType int
 )
 
+// Compilation time check that:
+var (
+	// InMemoryQueue implement Queue interface
+	_ Queue = (*InMemoryQueue)(nil)
+	// Message implement Message interface
+	_ Message = (*SimpleMessage)(nil)
+)
+
 const (
 	FIFO QueueType = iota
 	LIFO
