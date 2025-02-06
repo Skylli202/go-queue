@@ -31,7 +31,7 @@ func run(
 	ctx, cancel := signal.NotifyContext(ctx, os.Interrupt)
 	defer cancel()
 
-	srv := api.NewServer(&controller.QueueController{})
+	srv := api.NewServer(controller.NewQueueController())
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort("", "8080"),
 		Handler: srv,
