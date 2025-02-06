@@ -71,9 +71,9 @@ func (q *InMemoryQueue) Dequeue() (*Message, error) {
 // EmptyQueueError is returned to signal that the queue is empty and that the
 // operation cannot be performed.
 
-var ErrEmptyQueue = errors.New("queue is empty. nothing to dequeue.")
+var ErrEmptyQueue = errors.New("queue is empty - nothing to dequeue")
 
 // is returned to signal that the queue got QueueType that is either
 // unsupported, deprecated or simply not implemented. In theory this error
 // should not be returned often.
-var ErrNotImplementedQueueType = errors.New("queue type not implemented.")
+var ErrNotImplementedQueueType = errors.New("queue type not implemented")
