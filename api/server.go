@@ -1,6 +1,7 @@
 package api
 
 import (
+	"Skylli202/go-queue/controller"
 	"net/http"
 )
 
@@ -9,7 +10,7 @@ type Controller interface {
 }
 
 func NewServer(
-	qc *QueueController,
+	qc *controller.QueueController,
 ) http.Handler {
 	mux := http.NewServeMux()
 	var handler http.Handler = mux
