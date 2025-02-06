@@ -7,10 +7,10 @@ import (
 type (
 	SimpleMessage string
 	InMemoryQueue struct {
+		QueueType QueueType
 		store     []Message
-		queueType QueueType
 	}
-	QueueType int
+	QueueType string
 )
 
 // Compilation time check that:
@@ -22,15 +22,15 @@ var (
 )
 
 const (
-	FIFO QueueType = iota
-	LIFO
-	Priority
+	FIFO     QueueType = "FIFO"
+	LIFO     QueueType = "LIFO"
+	Priority QueueType = "Priority"
 )
 
 func NewInMemoryQueue(queueType QueueType) *InMemoryQueue {
 	return &InMemoryQueue{
 		store:     make([]Message, 0),
-		queueType: queueType,
+		QueueType: queueType,
 	}
 }
 
@@ -57,7 +57,7 @@ func (q *InMemoryQueue) Dequeue() (*Message, error) {
 		return nil, ErrEmptyQueue
 	}
 
-	switch q.queueType {
+	switch q.QueueType {
 	case FIFO:
 		pop := q.store[0]
 		q.store = q.store[1:]

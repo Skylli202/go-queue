@@ -17,6 +17,7 @@ func NewServer(
 
 	// qc.RegisterRoutes(mux)
 	mux.HandleFunc("GET /api/queue", qc.GetHandler)
+	mux.HandleFunc("POST /api/queue", qc.PostHandler)
 
 	return handler
 }
