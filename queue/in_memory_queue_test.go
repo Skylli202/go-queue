@@ -31,5 +31,5 @@ func Test_InMemoryQueueEmptyQueueError(t *testing.T) {
 	q := queue.NewInMemoryQueue(queue.FIFO)
 	m, err := q.Dequeue()
 	require.Nil(t, m, "Dequeueing an empty queue should return a nil pointer for the message")
-	require.ErrorIs(t, err, &queue.EmptyQueueError{}, "")
+	require.ErrorIs(t, err, queue.ErrEmptyQueue, "")
 }

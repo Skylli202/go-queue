@@ -1,6 +1,8 @@
 package queue
 
-import "fmt"
+import (
+	"errors"
+)
 
 type (
 	SimpleMessage string
@@ -33,7 +35,7 @@ func (q *InMemoryQueue) Enqueue(m Message) error {
 
 func (q *InMemoryQueue) Dequeue() (*Message, error) {
 	if q.Size() == 0 {
-		return nil, &EmptyQueueError{}
+		return nil, ErrEmptyQueue
 	}
 
 	switch q.queueType {
@@ -42,26 +44,17 @@ func (q *InMemoryQueue) Dequeue() (*Message, error) {
 		q.store = q.store[1:]
 		return &pop, nil
 	default:
-		return nil, &NotImplementedQueueType{queueType: q.queueType}
+		return nil, ErrNotImplementedQueueType
 	}
 }
 
 // Implementation of the error interface for the various custom error types.
 // EmptyQueueError is returned to signal that the queue is empty and that the
 // operation cannot be performed.
-type EmptyQueueError struct{}
 
-func (e *EmptyQueueError) Error() string {
-	return "Nothing to dequeue. Queue is empty."
-}
+var ErrEmptyQueue = errors.New("queue is empty. nothing to dequeue.")
 
 // is returned to signal that the queue got QueueType that is either
 // unsupported, deprecated or simply not implemented. In theory this error
 // should not be returned often.
-type NotImplementedQueueType struct {
-	queueType QueueType
-}
-
-func (e *NotImplementedQueueType) Error() string {
-	return fmt.Sprintf("QueueType %2d is not implemented, supported or is deprecated.", e.queueType)
-}
+var ErrNotImplementedQueueType = errors.New("queue type not implemented.")
