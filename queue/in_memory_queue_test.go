@@ -21,6 +21,11 @@ func Test_InMemoryQueue(t *testing.T) {
 	q.Enqueue("Fear is the path to the dark side. Fear leads to anger. Anger leads to hate. Hate leads to suffering.")
 	q.Enqueue("When I left you, I was but the learner. Now I am the master.")
 	require.Equal(t, 4, q.Size(), "InMemoryQueue should have a size of 4 after 4 enqueues.")
+	prePeekLen := q.Size()
+	peek, err := q.Peek()
+	require.NoError(t, err, "Peek should not return an error if the queue is not empty.")
+	require.Equal(t, m0, *peek, "Peek should return the first message in the queue.")
+	require.Equal(t, prePeekLen, q.Size(), "Peek should not dequeue the returned element.")
 
 	actual, err := q.Dequeue()
 	require.Equal(t, m0, *actual, "In FIFO, the first queued message is expected to the first dequeued.")

@@ -34,6 +34,17 @@ func NewInMemoryQueue(queueType QueueType) *InMemoryQueue {
 	}
 }
 
+func (q *InMemoryQueue) IsEmpty() bool {
+	return q.Size() == 0
+}
+
+func (q *InMemoryQueue) Peek() (*Message, error) {
+	if q.IsEmpty() {
+		return nil, ErrEmptyQueue
+	}
+	return &q.store[0], nil
+}
+
 func (q *InMemoryQueue) Size() int { return len(q.store) }
 
 func (q *InMemoryQueue) Enqueue(m Message) error {
