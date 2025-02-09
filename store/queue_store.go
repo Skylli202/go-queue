@@ -39,3 +39,16 @@ func (s *InMemoryQueueStore) Save(q queue.Queue) (uuid.UUID, error) {
 	// Hopefully this is never returned? As collision with UUID v4 is very unlikely...
 	return uuid.Nil, ErrAlreadyExist
 }
+
+func (s *InMemoryQueueStore) Get(id uuid.UUID) (queue.Queue, error) {
+	path := path.Join(s.rootPath, id.String())
+
+	_, err := os.Stat(path)
+	if err != nil {
+		return nil, err
+	}
+
+	q := queue.NewInMemoryQueue(queue.FIFO)
+
+	return q, nil
+}
