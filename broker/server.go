@@ -3,6 +3,8 @@ package broker
 import (
 	"log/slog"
 	"net/http"
+
+	"github.com/Skylli202/go-queue/broker/middleware"
 )
 
 type BrokerServerConfig struct{}
@@ -17,11 +19,14 @@ type BrokerServerConfig struct{}
 // routes.go to define the service's API surface.
 func NewBrokerServer(
 	config *BrokerServerConfig,
-	logger *slog.Logger,
+	slogger *slog.Logger,
 ) http.Handler {
 	mux := http.NewServeMux()
 	addRoutes(mux, logger)
 	var handler http.Handler = mux
+	handler = middleware.Metric(slogger, handler)
+	handler = middleware.RequestIdMiddleware(slogger, handler)
+	// handler = middleware.SimpleHeaderMiddleware(slogger, handler)
 	// handler = someMiddleware(handler)
 	// handler = someMiddleware2(handler)
 
