@@ -22,7 +22,7 @@ func NewBrokerServer(
 	slogger *slog.Logger,
 ) http.Handler {
 	mux := http.NewServeMux()
-	addRoutes(mux, logger)
+	addRoutes(mux, slogger)
 	var handler http.Handler = mux
 	handler = middleware.Metric(slogger, handler)
 	handler = middleware.RequestIdMiddleware(slogger, handler)
