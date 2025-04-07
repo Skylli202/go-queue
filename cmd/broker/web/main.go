@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"fmt"
 	"io"
 	"log/slog"
@@ -13,6 +14,8 @@ import (
 	"time"
 
 	"github.com/Skylli202/go-queue/broker"
+	"github.com/Skylli202/go-queue/broker/store"
+	_ "github.com/mattn/go-sqlite3"
 )
 
 func main() {
@@ -37,10 +40,21 @@ func run(
 	opts := &slog.HandlerOptions{Level: slog.LevelDebug}
 	handler := slog.NewJSONHandler(stdout, opts)
 	slogger := slog.New(handler)
+
+	// TODO: Add DB path control from both ENV & ARGS
+	db, err := sql.Open("sqlite3", "./main.db")
+	if err != nil {
+		return err
+	}
+	defer db.Close()
+	stores := store.NewStores(db)
+
 	s := broker.NewBrokerServer(
 		&broker.BrokerServerConfig{},
 		slogger,
+		stores,
 	)
+	// TODO: Add server's port control from both ENV & ARGS
 	httpServer := &http.Server{
 		Addr:    net.JoinHostPort("", "8080"),
 		Handler: s,

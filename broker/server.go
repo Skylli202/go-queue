@@ -5,6 +5,7 @@ import (
 	"net/http"
 
 	"github.com/Skylli202/go-queue/broker/middleware"
+	"github.com/Skylli202/go-queue/broker/store"
 )
 
 type BrokerServerConfig struct{}
@@ -20,9 +21,10 @@ type BrokerServerConfig struct{}
 func NewBrokerServer(
 	config *BrokerServerConfig,
 	slogger *slog.Logger,
+	stores *store.Stores,
 ) http.Handler {
 	mux := http.NewServeMux()
-	addRoutes(mux, slogger)
+	addRoutes(mux, slogger, stores)
 	var handler http.Handler = mux
 	handler = middleware.Metric(slogger, handler)
 	handler = middleware.RequestIdMiddleware(slogger, handler)
