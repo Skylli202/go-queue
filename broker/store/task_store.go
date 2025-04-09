@@ -22,6 +22,12 @@ func NewTask() *Task {
 	return &Task{}
 }
 
+type Store[T any] interface {
+	Insert(t T) (*T, error)
+}
+
+var _ Store[Task] = (*TaskStore)(nil)
+
 func (t *Task) String() string {
 	return fmt.Sprintf("ID: %q; CreatedAt: %q; Payload: %s", t.ID, t.CreatedAt, string(t.Payload))
 }
@@ -53,7 +59,7 @@ func NewTaskStore(db *sql.DB) *TaskStore {
 
 // HACK: Might have to rename this method later when a Store interface will be
 // required as more Model are created within the application.
-func (s *TaskStore) InsertTask(t Task) (*Task, error) {
+func (s *TaskStore) Insert(t Task) (*Task, error) {
 	const dtFmt string = "2006-01-02 15:04:05"
 	const create string = "INSERT INTO task (id, created_at, payload) VALUES (?,?,?);"
 
