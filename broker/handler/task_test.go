@@ -1,9 +1,11 @@
 package handler_test
 
 import (
+	"errors"
 	"io"
 	"log/slog"
 	"net/http"
+	"net/http/httptest"
 	"net/url"
 	"testing"
 
@@ -30,6 +32,14 @@ func (s *testTaskStore) Insert(task store.Task) (*store.Task, error) {
 
 var _ store.Store[store.Task] = (*testTaskStore)(nil)
 
+var errReadFailure = errors.New("reading failure")
+
+type ReaderFail struct{}
+
+func (ReaderFail) Read(p []byte) (n int, err error) {
+	return 0, errReadFailure
+}
+
 func TestTaskHandler(t *testing.T) {
 	slogger := slog.New(slog.NewTextHandler(io.Discard, nil))
 	taskStore := newTestTaskStore()
@@ -38,4 +48,14 @@ func TestTaskHandler(t *testing.T) {
 
 	require.HTTPStatusCode(t, h.ServeHTTP, http.MethodPost, "", url.Values{}, http.StatusCreated, "handler returned wrong status code")
 	require.Len(t, taskStore.store, 1, "handler did not properly Insert the task in the store")
+
+	t.Run("Error handling: reading request's body", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/", &ReaderFail{})
+		res := httptest.NewRecorder()
+
+		h.ServeHTTP(res, req)
+
+		// TODO: add tests to check that we log the error as well
+		require.Equal(t, http.StatusInternalServerError, res.Result().StatusCode)
+	})
 }
