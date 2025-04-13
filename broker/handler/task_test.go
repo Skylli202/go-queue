@@ -46,8 +46,10 @@ func TestTaskHandler(t *testing.T) {
 
 	h := handler.CreateTaskHandler(slogger, taskStore)
 
-	require.HTTPStatusCode(t, h.ServeHTTP, http.MethodPost, "", url.Values{}, http.StatusCreated, "handler returned wrong status code")
-	require.Len(t, taskStore.store, 1, "handler did not properly Insert the task in the store")
+	t.Run("happy path", func(t *testing.T) {
+		require.HTTPStatusCode(t, h.ServeHTTP, http.MethodPost, "", url.Values{}, http.StatusCreated, "handler returned wrong status code")
+		require.Len(t, taskStore.store, 1, "handler did not properly Insert the task in the store")
+	})
 
 	t.Run("Error handling: reading request's body", func(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/", &ReaderFail{})
