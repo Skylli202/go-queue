@@ -35,6 +35,7 @@ func CreateTaskHandler(slogger *slog.Logger, s store.Store[store.Task]) http.Han
 			w.WriteHeader(http.StatusCreated)
 			if err := json.NewEncoder(w).Encode(&t); err != nil {
 				slogger.Error("error while encoding task to ResponseWriter", "task", t, "error", err)
+				w.WriteHeader(http.StatusInternalServerError)
 			}
 		},
 	)
