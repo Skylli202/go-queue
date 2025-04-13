@@ -15,4 +15,11 @@ func TestTask(t *testing.T) {
 	require.NotZero(t, task.ID)
 	require.NotNil(t, task.CreatedAt)
 	require.NotZero(t, task.CreatedAt)
+
+	payload := "foo bar biz"
+	task.Payload = []byte(payload)
+	taskStr := task.String()
+	require.Contains(t, taskStr, task.ID.String())
+	require.Contains(t, taskStr, task.CreatedAt.String())
+	require.Contains(t, taskStr, payload)
 }
