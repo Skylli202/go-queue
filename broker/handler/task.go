@@ -7,14 +7,15 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/Skylli202/go-queue/broker/model"
 	"github.com/Skylli202/go-queue/broker/store"
 	"github.com/google/uuid"
 )
 
-func CreateTaskHandler(slogger *slog.Logger, s store.Store[store.Task]) http.Handler {
+func CreateTaskHandler(slogger *slog.Logger, s store.Store[model.Task]) http.Handler {
 	return http.HandlerFunc(
 		func(w http.ResponseWriter, r *http.Request) {
-			t := new(store.Task)
+			t := new(model.Task)
 			t.ID = uuid.New()
 			t.CreatedAt = time.Now().UTC()
 			defer r.Body.Close()

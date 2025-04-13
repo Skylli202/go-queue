@@ -2,35 +2,17 @@ package store
 
 import (
 	"database/sql"
-	"fmt"
 	"log/slog"
-	"time"
 
-	"github.com/google/uuid"
+	"github.com/Skylli202/go-queue/broker/model"
 	_ "github.com/mattn/go-sqlite3"
 )
-
-// Task is the Model (in the Repository Pattern context)
-type Task struct {
-	ID        uuid.UUID `json:"id"`
-	CreatedAt time.Time `json:"created_at"`
-	Payload   []byte    `json:"payload"`
-}
-
-// TODO: Implement this function to auto-generate the UUID & CreatedAt
-func NewTask() *Task {
-	return &Task{}
-}
 
 type Store[T any] interface {
 	Insert(t T) (*T, error)
 }
 
-var _ Store[Task] = (*TaskStore)(nil)
-
-func (t *Task) String() string {
-	return fmt.Sprintf("ID: %q; CreatedAt: %q; Payload: %s", t.ID, t.CreatedAt, string(t.Payload))
-}
+var _ Store[model.Task] = (*TaskStore)(nil)
 
 // TaskStore is the implementation of the respository pattern for the Model Task.
 type TaskStore struct {
@@ -59,7 +41,7 @@ func NewTaskStore(db *sql.DB) *TaskStore {
 
 // HACK: Might have to rename this method later when a Store interface will be
 // required as more Model are created within the application.
-func (s *TaskStore) Insert(t Task) (*Task, error) {
+func (s *TaskStore) Insert(t model.Task) (*model.Task, error) {
 	const dtFmt string = "2006-01-02 15:04:05"
 	const create string = "INSERT INTO task (id, created_at, payload) VALUES (?,?,?);"
 

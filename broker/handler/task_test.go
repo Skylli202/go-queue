@@ -10,22 +10,23 @@ import (
 	"testing"
 
 	"github.com/Skylli202/go-queue/broker/handler"
+	"github.com/Skylli202/go-queue/broker/model"
 	"github.com/Skylli202/go-queue/broker/store"
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 )
 
 type testTaskStore struct {
-	store map[uuid.UUID]store.Task
+	store map[uuid.UUID]model.Task
 }
 
 func newTestTaskStore() *testTaskStore {
 	return &testTaskStore{
-		store: make(map[uuid.UUID]store.Task, 10),
+		store: make(map[uuid.UUID]model.Task, 10),
 	}
 }
 
-func (s *testTaskStore) Insert(task store.Task) (*store.Task, error) {
+func (s *testTaskStore) Insert(task model.Task) (*model.Task, error) {
 	s.store[task.ID] = task
 	return &task, nil
 }
@@ -36,11 +37,11 @@ func newTestStoreFailer() *testStoreFailer {
 	return &testStoreFailer{}
 }
 
-func (testStoreFailer) Insert(store.Task) (*store.Task, error) {
+func (testStoreFailer) Insert(model.Task) (*model.Task, error) {
 	return nil, errStoreInsertFailure
 }
 
-var _ store.Store[store.Task] = (*testTaskStore)(nil)
+var _ store.Store[model.Task] = (*testTaskStore)(nil)
 
 var (
 	errReadFailure        = errors.New("reading failure")
