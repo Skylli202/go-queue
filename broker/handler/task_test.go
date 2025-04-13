@@ -30,9 +30,22 @@ func (s *testTaskStore) Insert(task store.Task) (*store.Task, error) {
 	return &task, nil
 }
 
+type testStoreFailer struct{}
+
+func newTestStoreFailer() *testStoreFailer {
+	return &testStoreFailer{}
+}
+
+func (testStoreFailer) Insert(store.Task) (*store.Task, error) {
+	return nil, errStoreInsertFailure
+}
+
 var _ store.Store[store.Task] = (*testTaskStore)(nil)
 
-var errReadFailure = errors.New("reading failure")
+var (
+	errReadFailure        = errors.New("reading failure")
+	errStoreInsertFailure = errors.New("insert failure")
+)
 
 type ReaderFail struct{}
 
@@ -55,6 +68,16 @@ func TestTaskHandler(t *testing.T) {
 		req := httptest.NewRequest(http.MethodPost, "/", &ReaderFail{})
 		res := httptest.NewRecorder()
 
+		h.ServeHTTP(res, req)
+
+		// TODO: add tests to check that we log the error as well
+		require.Equal(t, http.StatusInternalServerError, res.Result().StatusCode)
+	})
+	t.Run("Error handling: insert task into store", func(t *testing.T) {
+		req := httptest.NewRequest(http.MethodPost, "/", nil)
+		res := httptest.NewRecorder()
+
+		h := handler.CreateTaskHandler(slogger, newTestStoreFailer())
 		h.ServeHTTP(res, req)
 
 		// TODO: add tests to check that we log the error as well
